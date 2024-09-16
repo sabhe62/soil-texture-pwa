@@ -43,4 +43,57 @@ function classifySoilTexture() {
 
     // Display the result
     document.getElementById("result").innerHTML = `Soil Texture: ${soilTexture}<br>Sand: ${sand.toFixed(2)}%`;
+    
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/service-worker.js")
+            .then(registration => {
+              console.log("Service Worker registered with scope:", registration.scope);
+            })
+            .catch(error => {
+              console.error("Service Worker registration failed:", error);
+            });
+        });
+      }
+      
 }
+// Function to save input to local storage
+function saveInput(clay, silt) {
+    localStorage.setItem("clay", clay);
+    localStorage.setItem("silt", silt);
+  }
+  
+  // Modify the classifySoil function to save values when classifying
+  function classifySoil() {
+    const clay = document.getElementById("clay").value;
+    const silt = document.getElementById("silt").value;
+    const resultElement = document.getElementById("result");
+  
+    if (isNaN(clay) || isNaN(silt) || clay === "" || silt === "") {
+      resultElement.textContent = "Please enter valid numbers.";
+      return;
+    }
+  
+    // Save the input values to local storage
+    saveInput(clay, silt);
+  
+    const soilTexture = classifySoilTexture(parseFloat(clay), parseFloat(silt));
+    const sand = 100 - (parseFloat(clay) + parseFloat(silt));
+  
+    resultElement.textContent = `Soil Texture: ${soilTexture}, Sand: ${sand.toFixed(2)}%`;
+  }
+  // Function to load saved input from local storage
+function loadSavedInput() {
+    const savedClay = localStorage.getItem("clay");
+    const savedSilt = localStorage.getItem("silt");
+  
+    if (savedClay !== null && savedSilt !== null) {
+      document.getElementById("clay").value = savedClay;
+      document.getElementById("silt").value = savedSilt;
+    }
+  }
+  
+  // Load saved inputs when the page is loaded
+  window.onload = loadSavedInput;
+  
